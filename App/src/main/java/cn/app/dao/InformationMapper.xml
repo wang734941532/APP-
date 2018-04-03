@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.app.dao.InformationMapper">
+
+	<resultMap type="Information" id="infolist">
+	    <result property="id" column="id"/>
+	    <association property="version" javaType="Version">
+	    	 <id property="id" column="v_id"/>
+	      <result  property="versionno" column="vn"/>
+	    </association>
+	  </resultMap>
+
+
+  <select id="getInfoByStatusId" resultMap="infolist">
+  
+ SELECT i.*,v.id v_id,v.versionNo vn  FROM app_info  i left join app_version  v  on  i.versionId = v.id
+  AND  i.status = #{statusId} limit #{pageCount},#{pageSize} 
+    
+  </select>
+  
+  <select id="getInfoById" parameterType="int" resultType="Information">
+  select * from app_info where id = #{id}
+  
+  </select>
+  
+  
+  <select id="getInfoCount" resultType="int">
+  select count(1) from app_info
+  </select>
+  
+  <update id="updateStatus" >
+   UPDATE  app_info SET STATUS = #{value} WHERE id =#{id}
+  
+  </update>
+  
+  
+  <select id="getInfoList"  resultMap="infolist">
+  SELECT i.*,v.id v_id,v.versionNo vn  FROM app_info  i left join app_version  v  on  i.versionId = v.id
+   limit #{pageCount},#{pageSize} 
+  </select>
+  
+  
+  
+  <select id="queryInfo" resultType="Information">
+  SELECT * FROM app_info 
+  <where>
+  <if test="softName  !=  null">
+     and   softwareName like concat ('%',#{softName},'%')
+ </if>
+ 
+   <if  test="sort1 != null ">
+      or categoryLevel1 = #{sort1}
+     </if>
+   <if  test="sort2 != null ">
+     or categoryLevel2 = #{sort2}
+     </if>
+   <if  test="sort3 != null ">
+      or categoryLevel3 = #{sort3}
+     </if>
+  </where>
+ 
+  </select>
+  
+  <select id="upOne"  resultType="Information" parameterType="int">
+  
+  SELECT * FROM app_info WHERE STATUS = 2 AND id =#{id}
+  </select>
+  
+  <update id="upload" parameterType="int">
+  
+   UPDATE  app_info SET STATUS =4 WHERE id =#{id}
+  
+  </update>
+  
+  <select id="downOne" resultType="Information" parameterType="int">
+  
+  SELECT * FROM app_info WHERE STATUS = 4 AND id =#{id}
+  </select>
+  
+  <update id="download" parameterType="int">
+  
+   UPDATE  app_info SET STATUS =5 WHERE id =#{id}
+  
+  </update>
+  
+  <delete id="delete" parameterType="int">
+  
+    DELETE FROM app_info WHERE id = #{id}
+    
+  </delete>
+
+<insert id="insertSelective" parameterType="Information">
+INSERT INTO app_info(softwareName,APKName,supportROM,interfaceLanguage,softwareSize,downloads,flatformId, 
+categoryLevel1,categoryLevel2,categoryLevel3,status, appInfo,logoPicPath,logoLocPath)
+  VALUES(#{softwarename}, #{apkname},#{supportrom},#{interfacelanguage},#{softwaresize},#{downloads},#{flatformid},#{categorylevel1},#{categorylevel2},#{categorylevel3},#{status},#{appinfo},#{logopicpath},#{logolocpath})
+
+
+</insert>
+
+
+
+<update id="updateAppByPK"  parameterType="Information">
+<if test="logopicpath ==null">
+UPDATE  app_info SET softwareName =#{softwarename},APKName = #{apkname},supportROM = #{supportrom},
+  interfaceLanguage = #{interfacelanguage},softwareSize = #{softwaresize},downloads = #{downloads},
+  flatformId =#{flatformid},categoryLevel1 = #{categorylevel1},categoryLevel2 = #{categorylevel2},
+  categoryLevel3 =#{categorylevel3},status =#{status}, appInfo =#{appinfo} WHERE id = #{id}
+
+
+</if>
+<if test="logopicpath !=null">
+UPDATE  app_info SET softwareName =#{softwarename},  APKName = #{apkname},supportROM = #{supportrom},
+  interfaceLanguage = #{interfacelanguage},softwareSize = #{softwaresize},downloads = #{downloads},
+  flatformId =#{flatformid},categoryLevel1 = #{categorylevel1},categoryLevel2 = #{categorylevel2},
+  categoryLevel3 =#{categorylevel3},status =#{status},appInfo =#{appinfo},
+logoPicPath = #{logopicpath},logoLocPath =#{logolocpath} WHERE id = #{id}
+
+</if>
+</update>
+  
+</mapper>
